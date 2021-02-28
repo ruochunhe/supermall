@@ -1,6 +1,6 @@
 <template>
   <div class="goods">
-    <goods-list-item v-for="(item,index) in goods" :key="index" :item="item"></goods-list-item>
+      <goods-list-item v-for="(item,index) in goods" :key="index" :item="item" ></goods-list-item>
   </div>
 </template>
 
@@ -17,7 +17,13 @@ export default {
       default(){
         return []
       }
-    }
+    },
+    // goodsRecommend:{
+    //   type:Array,
+    //   default(){
+    //     return []
+    //   }
+    // }
   }
 }
 </script>

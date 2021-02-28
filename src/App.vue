@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <main-tabbar class="main-tabbar"></main-tabbar>
-    <router-view></router-view>
+    <main-tabbar class="main-tabbar" v-if="$route.path !== '/detail'"></main-tabbar>
+    <keep-alive exclude="Detail">
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -12,8 +14,9 @@ export default {
   name: 'app',
   components:{
     mainTabbar
-  }
+  },
 }
+
 </script>
 
 <style>

@@ -1,7 +1,7 @@
 <template>
-  <div class="goods-item">
+  <div class="goods-item" @click="goodsItemClick">
     <div class="goods-item-pic">
-      <img :src="item.show.img" alt="" @load="imageLoad">
+      <img :src="item.show&&item.show.img?item.show.img:item.image" alt="" @load="imageLoad">
     </div>
     <div class="goods-info">
       <p>{{item.title}}</p>
@@ -27,8 +27,20 @@ export default {
   methods: {
     imageLoad() {
       this.$bus.$emit('itemImageLoad')
+    },
+    goodsItemClick() {
+      const iid = this.item.iid
+      this.$router.push({
+        path: '/detail',
+        query: {iid}
+        })
     }
-  }
+  },
+  computed: {
+    	showImage() {
+    		return this.goodsItem.img || this.goodsItem.image || this.goodsItem.show.img
+      }
+    },
 }
 </script>
 

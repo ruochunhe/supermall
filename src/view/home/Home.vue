@@ -14,14 +14,13 @@
       <recommend-view :recommend="recommend"></recommend-view>
       <feature-view></feature-view>
       <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick" ref="middleTabControl"></tab-control>
-      <goods-list :goods="showGoods" :currentType="currentType"></goods-list>
+      <goods-list :goods="showGoods" :currentType="currentType" ></goods-list>
     </scroll>
       <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
 <script>
-// import swiper from './childComps/swiper'
 import HomeSwiper from './childComps/HomeSwiper'
 import homeNavBar from './childComps/HomeNavBar'
 import recommendView from './childComps/RecommendView'
@@ -37,11 +36,11 @@ import BackTop from 'components/content/backTop/BackTop'
 import { getHomeMultidata, getHomeGoods } from 'network/home'
 import { debounce } from 'common/utils.js'
 
+import { mapState } from 'vuex'
 
 export default {
   name: 'home',
   components: {
-    // swiper,
     HomeSwiper,
     homeNavBar,
     recommendView,
@@ -63,9 +62,11 @@ export default {
       },
       isShowBackTop: false,
       tabOffsetTop: 0,
-      isShowTopTabControl: false
+      isShowTopTabControl: false,
+      savePosition: 0
     }
   },
+
   created(){
     //获取banner和recommend数据
     this.getHomeMultidata()
@@ -76,10 +77,18 @@ export default {
     this.getHomeGoods('sell')
   },
   mounted() {
+    console.log(this.$store.state.loading);
     const refresh = debounce( this.$refs.scroll.refresh, 50)
     this.$bus.$on('itemImageLoad', () => {
       refresh()
     })
+  },
+  activated(){
+    this.$refs.scroll.scrollTo(0,this.savePosition)
+    this.$refs.scroll.refresh()
+  },
+  deactivated() {
+    this.savePosition = this.$refs.scroll.scroll.y
   },
   computed: {
     showGoods() {
@@ -87,7 +96,6 @@ export default {
     }
   },
   methods: {
-    
     tabClick(index){
       console.log(index);
       switch(index) {
@@ -127,7 +135,6 @@ export default {
     contentScroll(position){
       this.isShowBackTop = -(position.y) > 1000
       this.isShowTopTabControl = -position.y  >= this.tabOffsetTop
-      
     },
     //点击BackTop回到顶部
     backClick(){
@@ -135,6 +142,7 @@ export default {
     },
     homeSwiperImgLoad(){
       this.tabOffsetTop = this.$refs.middleTabControl.$el.offsetTop
+      
       // console.log(this.tabOffsetTop);
       
     }

@@ -3,15 +3,10 @@
     <div class="hy-swiper">
       <div class="swiper" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove" ref="swiper">
         <slot></slot>
-        <!-- <div v-for="item in banners" :key="item.acm" class="slide" >
-          <a :href="item.link">
-            <img :src="item.image" alt="" />
-          </a>
-        </div> -->
       </div>
       <div class="indicator" v-if="showIndicator && slideCount > 1">
         <ul>
-          <li v-for="(item,index) in slideCount" :key="index" class="indicatorItem" :class="{active: currentIndex == index + 1 || currentIndex == index-0+5 || currentIndex == index - 3}"></li>
+          <li v-for="(item,index) in slideCount" :key="index" class="indicatorItem" :class="{active: currentIndex == index + 1 || currentIndex == index + slideCount + 1|| currentIndex == index - slideCount -1}"></li>
         </ul>
       </div>
     </div>
@@ -42,13 +37,22 @@ export default {
       swiperStyle: {}, //swiper的样式
       currentIndex: 1, //当前的index
       totalWidth: 0, //swiper的宽度
+      SwiperFinishLoade: false//当未前后复制标签时，为false
     };
   },
   mounted() {
     setTimeout(() => {
-      this.handleDom();
+      if(!this.SwiperFinishLoade){
+
+        this.handleDom();
+      }
       this.startTimer();
     }, 100);
+  },
+  updated(){
+    if( !this.SwiperFinishLoade ){
+      this.handleDom();
+    }
   },
   methods: {
     // 操作dom，在dom前后添加slide
@@ -57,14 +61,18 @@ export default {
       let swiperEls = swiperEl.getElementsByClassName("slide");
       this.slideCount = swiperEls.length;
       if (this.slideCount > 1) {
+        this.SwiperFinishLoade = true
         let cloneFirst = swiperEls[0].cloneNode(true);
         let cloneLast = swiperEls[this.slideCount - 1].cloneNode(true);
         swiperEl.appendChild(cloneFirst);
         swiperEl.insertBefore(cloneLast, swiperEls[0]);
         this.totalWidth = swiperEl.offsetWidth;
         this.swiperStyle = swiperEl.style;
+        console.log('-----------');
       }
+        console.log('+++++++++++++++');
       this.setTransform(-this.totalWidth);
+
     },
     //设置滚动的位置
     setTransform(position) {
@@ -73,11 +81,12 @@ export default {
     startTimer: function () {
      this.playTimer = setInterval(() => {
         //每隔1500ms动一次
+        // console.log(this.slideCount);
         this.currentIndex++;
         this.swiperStyle.transition = this.animDuration + 'ms'
         this.setTransform(-this.currentIndex * this.totalWidth);
         //当图片移到最后一张时，延迟500ms切换到第一张
-        if (this.currentIndex === 5) {
+        if (this.currentIndex === this.slideCount+1) {
           setTimeout(() => {
             this.swiperStyle.transition = "0ms";
             this.currentIndex = 1
@@ -119,7 +128,7 @@ export default {
         this.currentIndex ++ 
       }
       //当移动到最后一页时，过渡完后切换到第一张
-      if (this.currentIndex === 5) {
+      if (this.currentIndex === this.slideCount + 1) {
           setTimeout(() => {
             this.swiperStyle.transition = "0ms";
             this.currentIndex = 1
@@ -130,7 +139,7 @@ export default {
       if (this.currentIndex === 0) {
           setTimeout(() => {
             this.swiperStyle.transition = "0ms";
-            this.currentIndex = 4
+            this.currentIndex = this.slideCount
             this.setTransform(-this.currentIndex * this.totalWidth);
           },this.animDuration)
         }

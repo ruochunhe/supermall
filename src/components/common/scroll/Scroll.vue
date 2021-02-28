@@ -33,15 +33,21 @@ export default {
       click: true,
       probeType: this.probeType,
       pullUpLoad: this.pullUpLoad,
-      // observeDOM: true
+      observeDOM: true
     })
     this.scroll.on('scroll',(position)=>{
       this.$emit('scroll',position)
     })
-    this.scroll.on('pullingUp',() => {
-      this.$emit('pullingUp')
-    })
+    if(this.pullUpLoad){
+      this.scroll.on('pullingUp',() => {
+        this.$emit('pullingUp')
+      })
+    }
+      // this.scroll.on('pullingUp',() => {
+      //   this.$emit('pullingUp')
+      // })
   },
+
   methods: {
     finishPullUp(){
       this.scroll.finishPullUp()
